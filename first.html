@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Music Recommender</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f8f9fa; }
+    h1 { color: #333; }
+    .result { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>🎵 Music Recommender</h1>
+  <input type="text" id="songInput" placeholder="Enter a song name" />
+  <button onclick="getRecommendations()">Recommend</button>
+
+  <div class="result" id="results"></div>
+
+  <script>
+    async function getRecommendations() {
+      const songName = document.getElementById("songInput").value;
+      const res = await fetch("http://localhost:5000/recommend", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ song_name: songName })
+      });
+
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+
+      if (res.ok) {
+        const data = await res.json();
+        data.forEach(song => {
+          resultsDiv.innerHTML += `<p>• <b>${song.track_name}</b> (distance: ${song.distance})</p>`;
+        });
+      } else {
+        const err = await res.json();
+        resultsDiv.innerHTML = `<p style="color:red;">${err.error}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
